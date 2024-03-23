@@ -1,9 +1,20 @@
 from django.shortcuts import render
 import requests
 from .models import City
+from .forms import CityForm
 
 def weather_list(request):
     cities = City.objects.all()
+   
+    if request.method == "POST":
+        form = CityForm(request.POST)
+    
+        if form.is_valid():
+            form.save()
+            form = CityForm()
+    else:
+        form = CityForm()
+   
     weather_data = []
     for city in cities:
         data = get_current_weather(city.name, city.country)
@@ -20,7 +31,9 @@ def weather_list(request):
             'humidity': data['main']['humidity']
         }
         weather_data.append(city_weather)
-    context = {'weather_data': weather_data}
+
+    
+    context = {'weather_data': weather_data, 'form': form}
     return render(request, 'core/list.html', context=context)
 
 
