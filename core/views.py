@@ -2,6 +2,7 @@ from django.shortcuts import render
 import requests
 from .models import City
 from .forms import CityForm
+from datetime import datetime
 
 def weather_list(request):
     cities = City.objects.all()
@@ -62,3 +63,24 @@ def get_current_weather(city, country):
     else:
         print("Cant fetch data")
     
+def forecast(request):
+    url = f"https://api.openweathermap.org/data/2.5/forecast?lat=44.34&lon=10.99&appid=98e201f7d727e4a86953ff2b72e265eb&units=metric"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        forecast_data = get_forecast_weather(data)
+    else:
+        forecast_data = None
+    context = {'weather_data':weather_data}
+    return render(request, 'core/forecast.html', context=context)
+
+
+def get_forecast_weather(data):
+    forecast_data = []
+    weather_data = []
+    for i in range(len(data['list'])):
+        time = data["list"][i]['dt_txt'].split(' ')
+        if '12:00:00' in time:
+            weather_data.append(data['list'][i])
+    for data in weather_data:
+        pass    
