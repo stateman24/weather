@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'theme',
      'django_browser_reload',
 
-
     # local app
     'core'
 ]
