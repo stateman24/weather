@@ -6,7 +6,8 @@
   class="px-3 py-6 flex flex-wrap md:flex-row flex-col md:space-x-6 space-y-6 items-center justify-center"
 >
   {% for city in weather_data %}
-  <div
+      <a href="{% url 'core:forecast' city.city_id %}">
+        <div
     class="w-1\4 flex flex-col bg-white rounded-xl border hover:border-blue-400 shadow-lg p-4 w-full max-w-xs"
   >
     <div class="font-bold text-xl">{{city.name}}</div>
@@ -38,8 +39,7 @@
         <div>
           <span class="text-sm"><i class="far fa-long-arrow-down"></i></span>
           <span class="text-sm font-light text-gray-500"
-            >{{city.min_temp}}°C</span
-          >
+            >{{city.min_temp}}°C</span>
         </div>
       </div>
     </div>
@@ -58,6 +58,8 @@
       </div>
     </div>
   </div>
+      </a>
+  
   {% endfor %}
 </div>
 

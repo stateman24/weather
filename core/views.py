@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 import requests
 from .models import City
 from .forms import CityForm
@@ -7,20 +7,21 @@ from datetime import datetime
 
 def weather_list(request):
     cities = City.objects.all()
-   
+
     if request.method == "POST":
         form = CityForm(request.POST)
-    
+
         if form.is_valid():
             form.save()
             form = CityForm()
     else:
         form = CityForm()
-   
+
     weather_data = []
     for city in cities:
         data = get_current_weather(city.name, city.country)
         city_weather = {
+            "city_id": city.id,
             'name': data['name'],
             'main': data['weather'][0]['main'],
             'desc': data['weather'][0]['main'],
@@ -47,7 +48,7 @@ def _get_lat_lon(city, country):
         data = r.json()
         lat = data[0]['lat']
         lon = data[0]['lon']
-        return lat, lon         # Returns the Latitiude and Longitude of the city 
+        return lat, lon  # Returns the Latitude and Longitude of the city
     else:
         return False
 
@@ -64,10 +65,12 @@ def get_current_weather(city, country):
             return data
     else:
         print("Cant fetch data")
-    
 
-def forecast(request):
-    url = (f"https://api.openweathermap.org/data/2.5/forecast?lat=44.34&lon=10.99&appid"
+
+def forecast(request, id):
+    city = get_object_or_404(City, id=id)
+    lat, lon = _get_lat_lon(city.name, city.country)
+    url = (f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid"
            f"=98e201f7d727e4a86953ff2b72e265eb&units=metric")
     response = requests.get(url)
     if response.status_code == 200:
@@ -84,8 +87,6 @@ def forecast(request):
                'city': city}
     return render(request, 'core/forecast.html', context=context)
 
-# TODO extract the desired data form the weather forecast
-
 
 def get_forecast_weather(data):
     weather_data = []
@@ -99,14 +100,24 @@ def get_forecast_weather(data):
 
 def _extract_forecast_data(weather_data):
     forecast_data = []
-    for i in range(len(weather_data)):
-        _forecast = weather_data[i]
-        forcast_for_the_day = [_forecast['main'],
-                               _forecast['weather'][0],
-                               _forecast['wind']]
-        timestamp = _forecast['dt_txt']
-        striped_timestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
-        formated_timestamp = striped_timestamp.strftime('%A %B %d %Y %I%p')
-        forcast_for_the_day.append({'date': formated_timestamp})
-        forecast_data.append(forcast_for_the_day)
+    for weather in weather_data:
+        date_str = weather['dt_txt'].split(' ')
+        date_str = date_str[0]
+        date_strp = datetime.strptime(date_str, '%Y-%m-%d')
+        formated_date = date_strp.strftime('%A,%B %d %Y').split(',')
+        day = formated_date[0]
+        month = formated_date[1]
+        day_weather = {
+            'temp': weather['main']['temp'],
+            'max_temp': weather['main']['temp_max'],
+            'min_temp': weather['main']['temp_min'],
+            'wind_speed': weather['wind']['speed'],
+            'pressure': weather['main']['pressure'],
+            'icon': weather['weather'][0]['icon'],
+            'description': weather['weather'][0]['description'],
+            'humidity': weather['main']['humidity'],
+            'day': day,
+            'month': month
+        }
+        forecast_data.append(day_weather)
     return forecast_data

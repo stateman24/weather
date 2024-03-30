@@ -5,5 +5,5 @@ app_name = 'core'
 
 urlpatterns = [
     path('', weather_list, name='weather_list'),
-    path('forecast/', forecast, name='forecast')
+    path('forecast/<int:id>/', forecast, name='forecast')
 ]

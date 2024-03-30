@@ -15,7 +15,7 @@
         <div
           class="container mx-auto flex flex-wrap items-center justify-between"
         >
-          <a href="#" class="flex">
+          <a href="{% url 'core:weather_list' %}" class="flex">
             <span class="self-center text-lg font-semibold whitespace-nowrap"
               >What is the Weather today</span
             >
@@ -38,12 +38,6 @@
                   ></path>
                 </svg>
               </div>
-              <input
-                type="text"
-                id="email-adress-icon"
-                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2"
-                placeholder="Search..."
-              />
             </div>
             <button
               data-collapse-toggle="mobile-menu-3"
@@ -83,19 +77,6 @@
             class="hidden md:flex justify-between items-center w-full md:w-auto md:order-1"
             id="mobile-menu-3"
           >
-            <ul
-              class="flex-col md:flex-row flex md:space-x-8 mt-4 md:mt-0 md:text-sm md:font-medium"
-            >
-              <li>
-                <a
-                  href="{% url "core:forecast" %}"
-                  class="bg-blue-700 md:bg-transparent text-white block pl-3 pr-4 py-2 md:text-blue-700 md:p-0 rounded"
-                  aria-current="page"
-                  >Forecast</a
-                >
-              </li>
-              
-            </ul>
           </div>
         </div>
       </nav>
